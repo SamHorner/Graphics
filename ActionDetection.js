@@ -1,15 +1,24 @@
 
 const action = {
-    WALKING: 0,
-    TURNRIGHT: 1,
-    TURNLEFT: 2
+    STANDING: 0,
+    WALKING: 1,
+    TURNRIGHT: 2,
+    TURNLEFT: 3
 }
 
-function GetActions()
+function GetActions(jointMeshes)
 {
 	var output = [];
 
-	output.push(action.WALKING);
+	if (IsStranding(jointMeshes))
+	{
+		output.push(action.WALKING);
+	}
 
 	return output;
+}
+
+function IsStranding(jointMeshes)
+{
+	return Math.abs(jointMeshes[kinectron.FOOTLEFT].position.y - jointMeshes[kinectron.FOOTRIGHT].position.y) < 0.2;
 }

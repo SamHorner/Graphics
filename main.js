@@ -119,7 +119,7 @@ function animate()
     requestAnimationFrame(animate);
     iFrame ++;
 
-    currentActions = GetActions();
+    currentActions = GetActions(jointMeshes);
     console.log(currentActions);
 
 
