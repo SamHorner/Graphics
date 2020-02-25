@@ -1,24 +1,37 @@
 
-const action = {
-    STANDING: 0,
-    WALKING: 1,
-    TURNRIGHT: 2,
-    TURNLEFT: 3
-}
-
-function GetActions(jointMeshes)
+function GetActions(jointMeshes, floorHeight = 0, testPage = false)
 {
 	var output = [];
+	var listOfGestures = "";
 
-	if (IsStranding(jointMeshes))
+
+
+	if (IsStranding(jointMeshes, floorHeight))
 	{
-		output.push(action.WALKING);
+		output.push(action.STANDING);
+		listOfGestures += "Standing, \n";
+	}
+
+
+
+
+
+
+	var moreActions = GetMoreActions(output, listOfGestures);
+	output = moreActions[0];
+	listOfGestures = moreActions[1];
+
+	if (testPage)
+	{
+		document.getElementById("gestures").innerHTML = listOfGestures;
 	}
 
 	return output;
 }
 
-function IsStranding(jointMeshes)
+function IsStranding(jointMeshes, floorHeight = 0)
 {
-	return Math.abs(jointMeshes[kinectron.FOOTLEFT].position.y - jointMeshes[kinectron.FOOTRIGHT].position.y) < 0.2;
+	//console.log(jointMeshes[kinectron.FOOTLEFT].position.y);
+	var verticalDistanceBetweenFeet = Math.abs(jointMeshes[kinectron.FOOTLEFT].position.y - jointMeshes[kinectron.FOOTRIGHT].position.y);
+	return verticalDistanceBetweenFeet < 0.2;
 }

@@ -1,16 +1,6 @@
-// Scene
-var scene = new THREE.Scene();
 
-// Camera
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.x = -4;
-camera.position.z = 4;
-camera.position.y = 2;
 
-// Render
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-container.appendChild( renderer.domElement );
+
 
 // OFFLINE KINECTRON //////////////////////////////////////////////////////////////////////////////////////
 // /*
@@ -56,10 +46,24 @@ kinectron.startTrackedBodies(getBodies); // Start tracked bodies and set callbac
 // */
 // END ONLINE KINECTRON /////////////////////////////////////////////////////////////////////////////////////////
 
+
 var currentActions = []
+var floor = -1;
 
 
+// Scene
+var scene = new THREE.Scene();
 
+// Camera
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.x = -4;
+camera.position.z = 4;
+camera.position.y = 2;
+
+// Render
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+container.appendChild( renderer.domElement );
 
 // Add the ambient light
 var lightAmbient = new THREE.AmbientLight( 0x888888 ); 
@@ -119,11 +123,7 @@ function animate()
     requestAnimationFrame(animate);
     iFrame ++;
 
-    currentActions = GetActions(jointMeshes);
-    console.log(currentActions);
-
-
-
+    currentActions = GetActions(jointMeshes, floor, document.getElementById("gestures") != null);
 
 
 
@@ -134,8 +134,6 @@ function animate()
     {
         getBodies(jsonMotion[iFrameToRender]);
     }
-
-
 
     renderer.render(scene, camera);
 }
