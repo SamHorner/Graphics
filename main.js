@@ -91,6 +91,7 @@ var jointMeshes = [];
 for (var i = 0; i < 25; i++)
 {
   var mesh = new THREE.Mesh(g, m);
+  
   scene.add(mesh);
 
   jointMeshes.push(mesh);

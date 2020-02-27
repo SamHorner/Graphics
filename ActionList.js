@@ -2,6 +2,7 @@
 const action = {
     STANDING: 0,
     WALKING: 1,
-    TURNRIGHT: 2,
-    TURNLEFT: 3
+    ARMRAISEDRIGHT: 2,
+    ARMRAISEDLEFT: 3,
+    CLAPPING: 4
 };

@@ -1,11 +1,16 @@
 
-function GetMoreActions(actions = [], displayString = "")
+var deltaTime;
+
+function GetMoreActions(actions = [], displayString = "", jointMeshes = [], floorHeight = 0, deltaTimeNew = 0)
 {
-	if (GetIsTurnRight())
+	deltaTime = deltaTimeNew;
+
+	if (GetIsTurnRight(jointMeshes, floorHeight))
 	{
-		actions.push(action.TURNRIGHT);
-		displayString += "Test";	
+		actions.push(action.ARMRAISEDRIGHT);
+		displayString += "<li>Arm Raised Right</li>";	
 	}
+
 
 
 
@@ -14,7 +19,7 @@ function GetMoreActions(actions = [], displayString = "")
 	return output;
 }
 
-function GetIsTurnRight()
+function GetIsTurnRight(jointMeshes, floorHeight = 0)
 {
-	return true;
+	return false;
 }
