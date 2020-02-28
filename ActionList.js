@@ -4,5 +4,8 @@ const action = {
     WALKING: 1,
     ARMRAISEDRIGHT: 2,
     ARMRAISEDLEFT: 3,
-    CLAPPING: 4
+    CLAPPING: 4,
+    PUNCHINGLEFT: 5,
+    PUNCHINGRIGHT: 6,
+    PUNCHINGLEFT: 7
 };
