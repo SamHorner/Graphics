@@ -7,5 +7,5 @@ const action = {
     CLAPPING: 4,
     PUNCHINGLEFT: 5,
     PUNCHINGRIGHT: 6,
-    PUNCHINGLEFT: 7
+    CROUCHING: 7
 };

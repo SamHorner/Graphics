@@ -23,6 +23,16 @@ function GetActions(jointMeshes, floorHeight = 0, testPage = false)
 		listOfGestures += "<li> - </li>";	
 	}
 
+	if (IsCrouching(jointMeshes, floorHeight))
+	{
+		output.push(action.Crouching);
+		listOfGestures += "<li>Crouching</li>";
+	}
+	else
+	{
+		listOfGestures += "<li> - </li>";	
+	}
+
 	if (IsWalking(jointMeshes, floorHeight))
 	{
 		output.push(action.WALKING);
@@ -77,6 +87,17 @@ function IsStanding(jointMeshes, floorHeight = 0)
 	var isLeftFootOnFloor = Math.abs(jointMeshes[kinectron.FOOTLEFT].position.y - floorHeight);
 	var isRightFootOnFloor = Math.abs(jointMeshes[kinectron.FOOTRIGHT].position.y - floorHeight);
 	return verticalDistanceBetweenFeet < 0.1 && isLeftFootOnFloor < 0.1 && isRightFootOnFloor < 0.1;
+}
+
+function IsCrouching(jointMeshes, floorHeight = 0)
+{
+	//console.log(jointMeshes[kinectron.FOOTLEFT].position.y);
+	var verticalDistanceBetweenLeftKneeAndHip = Math.abs(jointMeshes[kinectron.KNEELEFT].position.y - jointMeshes[kinectron.HIPLEFT].position.y);
+	var verticalDistanceBetweenLeftKneeAndAnkle = Math.abs(jointMeshes[kinectron.KNEELEFT].position.y - jointMeshes[kinectron.ANKLELEFT].position.y);
+	var verticalDistanceBetweenRightKneeAndHip = Math.abs(jointMeshes[kinectron.KNEERIGHT].position.y - jointMeshes[kinectron.HIPRIGHT].position.y);
+	var verticalDistanceBetweenRightKneeAndAnkle = Math.abs(jointMeshes[kinectron.KNEERIGHT].position.y - jointMeshes[kinectron.ANKLERIGHT].position.y);
+
+	return verticalDistanceBetweenLeftKneeAndHip < 0.3 && verticalDistanceBetweenLeftKneeAndAnkle < 0.3 && verticalDistanceBetweenRightKneeAndHip < 0.3 && verticalDistanceBetweenRightKneeAndAnkle < 0.3;
 }
 
 var rightHandPosLastFrame = new THREE.Vector3(0,0,0);
