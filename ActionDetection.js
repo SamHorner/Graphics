@@ -91,13 +91,35 @@ function IsStanding(jointMeshes, floorHeight = 0)
 
 function IsCrouching(jointMeshes, floorHeight = 0)
 {
-	//console.log(jointMeshes[kinectron.FOOTLEFT].position.y);
-	var verticalDistanceBetweenLeftKneeAndHip = Math.abs(jointMeshes[kinectron.KNEELEFT].position.y - jointMeshes[kinectron.HIPLEFT].position.y);
-	var verticalDistanceBetweenLeftKneeAndAnkle = Math.abs(jointMeshes[kinectron.KNEELEFT].position.y - jointMeshes[kinectron.ANKLELEFT].position.y);
-	var verticalDistanceBetweenRightKneeAndHip = Math.abs(jointMeshes[kinectron.KNEERIGHT].position.y - jointMeshes[kinectron.HIPRIGHT].position.y);
-	var verticalDistanceBetweenRightKneeAndAnkle = Math.abs(jointMeshes[kinectron.KNEERIGHT].position.y - jointMeshes[kinectron.ANKLERIGHT].position.y);
+	// Angle of knees
+	
+	var leftKneeToHipV = new THREE.Vector3(0,0,0);
+	leftKneeToHipV.x = jointMeshes[kinectron.HIPLEFT].position.x - jointMeshes[kinectron.KNEELEFT].position.x;
+	leftKneeToHipV.y = jointMeshes[kinectron.HIPLEFT].position.y - jointMeshes[kinectron.KNEELEFT].position.y;
+	leftKneeToHipV.z = jointMeshes[kinectron.HIPLEFT].position.z - jointMeshes[kinectron.KNEELEFT].position.z;
 
-	return verticalDistanceBetweenLeftKneeAndHip < 0.3 && verticalDistanceBetweenLeftKneeAndAnkle < 0.3 && verticalDistanceBetweenRightKneeAndHip < 0.3 && verticalDistanceBetweenRightKneeAndAnkle < 0.3;
+	var leftKneeToAnkleV = new THREE.Vector3(0,0,0);
+	leftKneeToAnkleV.x = jointMeshes[kinectron.HIPLEFT].position.x - jointMeshes[kinectron.ANKLELEFT].position.x;
+	leftKneeToAnkleV.y = jointMeshes[kinectron.HIPLEFT].position.y - jointMeshes[kinectron.ANKLELEFT].position.y;
+	leftKneeToAnkleV.z = jointMeshes[kinectron.HIPLEFT].position.z - jointMeshes[kinectron.ANKLELEFT].position.z;
+
+	var leftKneeAngle = AngleBetweenVectors(vec1, vec2);
+
+	
+	var rightKneeToHipV = new THREE.Vector3(0,0,0);
+	rightKneeToHipV.x = jointMeshes[kinectron.HIPRIGHT].position.x - jointMeshes[kinectron.KNEERIGHT].position.x;
+	rightKneeToHipV.y = jointMeshes[kinectron.HIPRIGHT].position.y - jointMeshes[kinectron.KNEERIGHT].position.y;
+	rightKneeToHipV.z = jointMeshes[kinectron.HIPRIGHT].position.z - jointMeshes[kinectron.KNEERIGHT].position.z;
+
+	var rightKneeToAnkleV = new THREE.Vector3(0,0,0);
+	rightKneeToAnkleV.x = jointMeshes[kinectron.ANKLERIGHT].position.x - jointMeshes[kinectron.KNEERIGHT].position.x;
+	rightKneeToAnkleV.y = jointMeshes[kinectron.ANKLERIGHT].position.y - jointMeshes[kinectron.KNEERIGHT].position.y;
+	rightKneeToAnkleV.z = jointMeshes[kinectron.ANKLERIGHT].position.z - jointMeshes[kinectron.KNEERIGHT].position.z;
+
+	var rightKneeAngle = AngleBetweenVectors(vec1, vec2);
+
+	return leftKneeAngle < 90 && rightKneeAngle < 90;
+
 }
 
 var rightHandPosLastFrame = new THREE.Vector3(0,0,0);
@@ -198,4 +220,16 @@ function VectorDistance(vec1, vec2)
 	var distance = Math.abs(Math.sqrt(difference.x*difference.x + difference.y*difference.y + difference.z*difference.z));
 	console.log(distance);
 	return distance;
+}
+
+function AngleBetweenVectors(vec1, vec2)
+{
+	// cos(a) = (vec1 . vec2) / |vec1| * |vec2|
+
+	var dotProduct = vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+	var vec1Mag = VectorDistance(vec1, new THREE.Vector3(0,0,0));
+	var vec2Mag = VectorDistance(vec2, new THREE.Vector3(0,0,0));
+
+	var a = Math.acos(dotProduct / (vec1Mag * vec2Mag));
+	return a;
 }
