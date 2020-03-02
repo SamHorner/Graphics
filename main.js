@@ -27,7 +27,7 @@ var iJsonFrame = 0;
 var jsonMotion = null;
 
 // Read the JSON file motion.json
-readTextFile("Motions/walkSmol.json", function(text)
+readTextFile("Motions/armLeftTol.json", function(text)
 {
     jsonMotion = JSON.parse(text);
     iJsonFrame = Object.keys(jsonMotion).length;
@@ -56,8 +56,8 @@ var scene = new THREE.Scene();
 
 // Camera
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.x = -4;
-camera.position.z = 4;
+camera.position.x = 0;
+camera.position.z = -4;
 camera.position.y = 2;
 
 // Render
