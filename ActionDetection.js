@@ -63,6 +63,16 @@ function GetActions(jointMeshes, floorHeight = 0, testPage = false)
 		listOfGestures += "<li> - </li>";	
 	}
 
+	if (IsStatuePose1(jointMeshes))
+	{
+		//output.push(action.PUNCHINGLEFT);
+		//listOfGestures += "<li>Left Punch</li>";
+	}
+	else
+	{
+		//listOfGestures += "<li> - </li>";	
+	}
+
 
 
 
@@ -78,6 +88,30 @@ function GetActions(jointMeshes, floorHeight = 0, testPage = false)
 	}
 
 	return output;
+}
+
+function IsStatuePose1(jointMeshes, floorHeight = 0)
+{
+	var distanceLeftHandToHead = VectorDistance(jointMeshes[kinectron.HANDLEFT].position, jointMeshes[kinectron.HEAD].position);
+	var distanceRightHandToHead = VectorDistance(jointMeshes[kinectron.HANDRIGHT].position, jointMeshes[kinectron.HEAD].position);
+	var rightElbowToHeadFronts = Math.abs(jointMeshes[kinectron.ELBOWRIGHT].position.x - jointMeshes[kinectron.HEAD].position.x);
+	var leftElbowToHeadFronts = Math.abs(jointMeshes[kinectron.ELBOWLEFT].position.x - jointMeshes[kinectron.HEAD].position.x);
+
+	var leftFootToFloor = Math.abs(jointMeshes[kinectron.FOOTLEFT].position.y - floorHeight);
+	var rightKneeToRightHipHeight = Math.abs(jointMeshes[kinectron.KNEERIGHT].position.y - jointMeshes[kinectron.HIPRIGHT].position.y);
+	var rightKneeToRightHipSides = Math.abs(jointMeshes[kinectron.KNEERIGHT].position.z - jointMeshes[kinectron.HIPRIGHT].position.z);
+	var rightFootToRightKneeSides = Math.abs(jointMeshes[kinectron.FOOTRIGHT].position.z - jointMeshes[kinectron.KNEERIGHT].position.z);
+	var rightFootToRightKneeFront = Math.abs(jointMeshes[kinectron.FOOTRIGHT].position.x - jointMeshes[kinectron.KNEERIGHT].position.x);
+
+	var isHandsOnHead = distanceLeftHandToHead < 0.1 && distanceRightHandToHead < 0.1;
+	var isElbowsOutwards = rightElbowToHeadFronts < 0.1 && leftElbowToHeadFronts < 0.1;
+	var isLeftFootOnFloor = leftFootToFloor < 0.1;
+	var isRightKneeForwards = rightKneeToRightHipHeight < 0.1 && rightKneeToRightHipSides < 0.1;
+	var isRightFootDown = rightFootToRightKneeSides < 0.1 && rightFootToRightKneeFront < 0.1;
+
+	console.log(jointMeshes[kinectron.HANDLEFT].position.z);
+
+	return isHandsOnHead && isElbowsOutwards && isLeftFootOnFloor && isRightKneeForwards && isRightFootDown;
 }
 
 function IsStanding(jointMeshes, floorHeight = 0)
@@ -99,11 +133,11 @@ function IsCrouching(jointMeshes, floorHeight = 0)
 	leftKneeToHipV.z = jointMeshes[kinectron.HIPLEFT].position.z - jointMeshes[kinectron.KNEELEFT].position.z;
 
 	var leftKneeToAnkleV = new THREE.Vector3(0,0,0);
-	leftKneeToAnkleV.x = jointMeshes[kinectron.HIPLEFT].position.x - jointMeshes[kinectron.ANKLELEFT].position.x;
-	leftKneeToAnkleV.y = jointMeshes[kinectron.HIPLEFT].position.y - jointMeshes[kinectron.ANKLELEFT].position.y;
-	leftKneeToAnkleV.z = jointMeshes[kinectron.HIPLEFT].position.z - jointMeshes[kinectron.ANKLELEFT].position.z;
+	leftKneeToAnkleV.x = jointMeshes[kinectron.ANKLELEFT].position.x - jointMeshes[kinectron.KNEELEFT].position.x;
+	leftKneeToAnkleV.y = jointMeshes[kinectron.ANKLELEFT].position.y - jointMeshes[kinectron.KNEELEFT].position.y;
+	leftKneeToAnkleV.z = jointMeshes[kinectron.ANKLELEFT].position.z - jointMeshes[kinectron.KNEELEFT].position.z;
 
-	var leftKneeAngle = AngleBetweenVectors(vec1, vec2);
+	var leftKneeAngle = AngleBetweenVectors(leftKneeToHipV, leftKneeToAnkleV);
 
 	
 	var rightKneeToHipV = new THREE.Vector3(0,0,0);
@@ -116,10 +150,9 @@ function IsCrouching(jointMeshes, floorHeight = 0)
 	rightKneeToAnkleV.y = jointMeshes[kinectron.ANKLERIGHT].position.y - jointMeshes[kinectron.KNEERIGHT].position.y;
 	rightKneeToAnkleV.z = jointMeshes[kinectron.ANKLERIGHT].position.z - jointMeshes[kinectron.KNEERIGHT].position.z;
 
-	var rightKneeAngle = AngleBetweenVectors(vec1, vec2);
+	var rightKneeAngle = AngleBetweenVectors(rightKneeToHipV, rightKneeToAnkleV);
 
-	return leftKneeAngle < 90 && rightKneeAngle < 90;
-
+	return leftKneeAngle < 1.5 && rightKneeAngle < 1.5;
 }
 
 var rightHandPosLastFrame = new THREE.Vector3(0,0,0);
@@ -218,7 +251,7 @@ function VectorDistance(vec1, vec2)
 	difference.y = vec1.y - vec2.y;
 	difference.z = vec1.z - vec2.z;
 	var distance = Math.abs(Math.sqrt(difference.x*difference.x + difference.y*difference.y + difference.z*difference.z));
-	console.log(distance);
+	
 	return distance;
 }
 
