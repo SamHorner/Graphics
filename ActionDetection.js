@@ -94,22 +94,20 @@ function IsStatuePose1(jointMeshes, floorHeight = 0)
 {
 	var distanceLeftHandToHead = VectorDistance(jointMeshes[kinectron.HANDLEFT].position, jointMeshes[kinectron.HEAD].position);
 	var distanceRightHandToHead = VectorDistance(jointMeshes[kinectron.HANDRIGHT].position, jointMeshes[kinectron.HEAD].position);
-	var rightElbowToHeadFronts = Math.abs(jointMeshes[kinectron.ELBOWRIGHT].position.x - jointMeshes[kinectron.HEAD].position.x);
-	var leftElbowToHeadFronts = Math.abs(jointMeshes[kinectron.ELBOWLEFT].position.x - jointMeshes[kinectron.HEAD].position.x);
+	var rightElbowForwardDot = DotProductWithForwardVector(MinusVector(jointMeshes[kinectron.ELBOWRIGHT].position, jointMeshes[kinectron.SHOULDERRIGHT].position));
+	var leftElbowForwardDot = DotProductWithForwardVector(MinusVector(jointMeshes[kinectron.ELBOWLEFT].position, jointMeshes[kinectron.SHOULDERLEFT].position));
 
 	var leftFootToFloor = Math.abs(jointMeshes[kinectron.FOOTLEFT].position.y - floorHeight);
-	var rightKneeToRightHipHeight = Math.abs(jointMeshes[kinectron.KNEERIGHT].position.y - jointMeshes[kinectron.HIPRIGHT].position.y);
-	var rightKneeToRightHipSides = Math.abs(jointMeshes[kinectron.KNEERIGHT].position.z - jointMeshes[kinectron.HIPRIGHT].position.z);
-	var rightFootToRightKneeSides = Math.abs(jointMeshes[kinectron.FOOTRIGHT].position.z - jointMeshes[kinectron.KNEERIGHT].position.z);
-	var rightFootToRightKneeFront = Math.abs(jointMeshes[kinectron.FOOTRIGHT].position.x - jointMeshes[kinectron.KNEERIGHT].position.x);
+	var rightKneeToRightHipUpDot = DotProductWithRightVector(MinusVector(jointMeshes[kinectron.KNEERIGHT].position, jointMeshes[kinectron.HIPRIGHT].position));
+	var rightKneeToRightHipRightDot = DotProductWithRightVector(MinusVector(jointMeshes[kinectron.KNEERIGHT].position, jointMeshes[kinectron.HIPRIGHT].position));
+	var rightFootToRightKneeForwardDot = DotProductWithForwardVector(MinusVector(jointMeshes[kinectron.FOOTRIGHT].position, jointMeshes[kinectron.KNEERIGHT].position));
+	var rightFootToRightKneeRightDot = DotProductWithRightVector(MinusVector(jointMeshes[kinectron.FOOTRIGHT].position, jointMeshes[kinectron.KNEERIGHT].position));
 
-	var isHandsOnHead = distanceLeftHandToHead < 0.1 && distanceRightHandToHead < 0.1;
-	var isElbowsOutwards = rightElbowToHeadFronts < 0.1 && leftElbowToHeadFronts < 0.1;
-	var isLeftFootOnFloor = leftFootToFloor < 0.1;
-	var isRightKneeForwards = rightKneeToRightHipHeight < 0.1 && rightKneeToRightHipSides < 0.1;
-	var isRightFootDown = rightFootToRightKneeSides < 0.1 && rightFootToRightKneeFront < 0.1;
-
-	console.log(jointMeshes[kinectron.HANDLEFT].position.z);
+	var isHandsOnHead = distanceLeftHandToHead < 0.2 && distanceRightHandToHead < 0.2;
+	var isElbowsOutwards = Math.abs(rightElbowForwardDot) < 0.2 && Math.abs(leftElbowForwardDot) < 0.2;
+	var isLeftFootOnFloor = leftFootToFloor < 0.2;
+	var isRightKneeForwards = Math.abs(rightKneeToRightHipUpDot) < 0.2 && Math.abs(rightKneeToRightHipRightDot) < 0.2;
+	var isRightFootDown = Math.abs(rightFootToRightKneeForwardDot) < 0.1 && Math.abs(rightFootToRightKneeRightDot) < 0.2;
 
 	return isHandsOnHead && isElbowsOutwards && isLeftFootOnFloor && isRightKneeForwards && isRightFootDown;
 }
@@ -244,25 +242,134 @@ function IsWalking(jointMeshes, floorHeight = 0)
 	}
 }
 
+
+
+// Maths
+
+function MinusVector(vec1, vec2)
+{
+	var output = new THREE.Vector3(0,0,0);
+	output.x = vec1.x - vec2.x;
+	output.y = vec1.y - vec2.y;
+	output.z = vec1.z - vec2.z;
+	return output;
+}
+
 function VectorDistance(vec1, vec2)
 {
-	var difference = new THREE.Vector3(0,0,0) 
+	var difference = new THREE.Vector3(0,0,0); 
 	difference.x = vec1.x - vec2.x;
 	difference.y = vec1.y - vec2.y;
 	difference.z = vec1.z - vec2.z;
-	var distance = Math.abs(Math.sqrt(difference.x*difference.x + difference.y*difference.y + difference.z*difference.z));
+	var distance = VectorMagnitude(difference);
 	
 	return distance;
+}
+
+function VectorMagnitude(vec)
+{
+	return Math.abs(Math.sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z));
 }
 
 function AngleBetweenVectors(vec1, vec2)
 {
 	// cos(a) = (vec1 . vec2) / |vec1| * |vec2|
 
-	var dotProduct = vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+	var dotProduct = DotProduct(vec1, vec2);
 	var vec1Mag = VectorDistance(vec1, new THREE.Vector3(0,0,0));
 	var vec2Mag = VectorDistance(vec2, new THREE.Vector3(0,0,0));
 
 	var a = Math.acos(dotProduct / (vec1Mag * vec2Mag));
 	return a;
+}
+
+function DotProduct(vec1, vec2)
+{
+	return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+}
+
+function DotProductWithForwardVector(vec)
+{
+	vec.x /= VectorMagnitude(vec);
+	vec.y /= VectorMagnitude(vec);
+	vec.z /= VectorMagnitude(vec);
+
+	var upVector = new THREE.Vector3(0,0,0);
+	upVector.x = jointMeshes[kinectron.SPINESHOULDER].position.x - jointMeshes[kinectron.SPINEMID].position.x;
+	upVector.y = jointMeshes[kinectron.SPINESHOULDER].position.y - jointMeshes[kinectron.SPINEMID].position.y;
+	upVector.z = jointMeshes[kinectron.SPINESHOULDER].position.z - jointMeshes[kinectron.SPINEMID].position.z;
+
+	upVector.x /= VectorMagnitude(upVector);
+	upVector.y /= VectorMagnitude(upVector);
+	upVector.z /= VectorMagnitude(upVector);
+
+	var rightVector = new THREE.Vector3(0,0,0);
+	rightVector.x = jointMeshes[kinectron.SHOULDERRIGHT].position.x - jointMeshes[kinectron.SHOULDERLEFT].position.x;
+	rightVector.y = jointMeshes[kinectron.SHOULDERRIGHT].position.y - jointMeshes[kinectron.SHOULDERLEFT].position.y;
+	rightVector.z = jointMeshes[kinectron.SHOULDERRIGHT].position.z - jointMeshes[kinectron.SHOULDERLEFT].position.z;
+
+	rightVector.x /= VectorMagnitude(rightVector);
+	rightVector.y /= VectorMagnitude(rightVector);
+	rightVector.z /= VectorMagnitude(rightVector);
+
+	var crossProduct = new THREE.Vector3(0,0,0);
+	crossProduct.x = upVector.y*rightVector.z - upVector.z*rightVector.y;
+	crossProduct.y = upVector.x*rightVector.z - upVector.z*rightVector.x;
+	crossProduct.z = upVector.x*rightVector.y - upVector.y*rightVector.x;
+
+	return DotProduct(vec, crossProduct);
+}
+
+function DotProductWithUpVector(vec)
+{
+	vec.x /= VectorMagnitude(vec);
+	vec.y /= VectorMagnitude(vec);
+	vec.z /= VectorMagnitude(vec);
+
+	var upVector = new THREE.Vector3(0,0,0);
+	upVector.x = jointMeshes[kinectron.SPINESHOULDER].position.x - jointMeshes[kinectron.SPINEMID].position.x;
+	upVector.y = jointMeshes[kinectron.SPINESHOULDER].position.y - jointMeshes[kinectron.SPINEMID].position.y;
+	upVector.z = jointMeshes[kinectron.SPINESHOULDER].position.z - jointMeshes[kinectron.SPINEMID].position.z;
+
+	upVector.x /= VectorMagnitude(upVector);
+	upVector.y /= VectorMagnitude(upVector);
+	upVector.z /= VectorMagnitude(upVector);
+
+	return DotProduct(vec, upVector);
+}
+
+function DotProductWithRightVector(vec)
+{
+	vec.x /= VectorMagnitude(vec);
+	vec.y /= VectorMagnitude(vec);
+	vec.z /= VectorMagnitude(vec);
+
+	var upVector = new THREE.Vector3(0,0,0);
+	upVector.x = jointMeshes[kinectron.SPINESHOULDER].position.x - jointMeshes[kinectron.SPINEMID].position.x;
+	upVector.y = jointMeshes[kinectron.SPINESHOULDER].position.y - jointMeshes[kinectron.SPINEMID].position.y;
+	upVector.z = jointMeshes[kinectron.SPINESHOULDER].position.z - jointMeshes[kinectron.SPINEMID].position.z;
+
+	upVector.x /= VectorMagnitude(upVector);
+	upVector.y /= VectorMagnitude(upVector);
+	upVector.z /= VectorMagnitude(upVector);
+
+	return DotProduct(vec, upVector);
+}
+
+function DotProductWithForwardVector(vec)
+{
+	vec.x /= VectorMagnitude(vec);
+	vec.y /= VectorMagnitude(vec);
+	vec.z /= VectorMagnitude(vec);
+
+	var rightVector = new THREE.Vector3(0,0,0);
+	rightVector.x = jointMeshes[kinectron.SHOULDERRIGHT].position.x - jointMeshes[kinectron.SHOULDERLEFT].position.x;
+	rightVector.y = jointMeshes[kinectron.SHOULDERRIGHT].position.y - jointMeshes[kinectron.SHOULDERLEFT].position.y;
+	rightVector.z = jointMeshes[kinectron.SHOULDERRIGHT].position.z - jointMeshes[kinectron.SHOULDERLEFT].position.z;
+
+	rightVector.x /= VectorMagnitude(rightVector);
+	rightVector.y /= VectorMagnitude(rightVector);
+	rightVector.z /= VectorMagnitude(rightVector);
+
+	return DotProduct(vec, rightVector);
 }
