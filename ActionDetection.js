@@ -63,14 +63,34 @@ function GetActions(jointMeshes, floorHeight = 0, testPage = false)
 		listOfGestures += "<li> - </li>";	
 	}
 
-	if (IsStatuePose1(jointMeshes))
+	if (IsJumping(jointMeshes, floorHeight))
 	{
-		//output.push(action.PUNCHINGLEFT);
-		//listOfGestures += "<li>Left Punch</li>";
+		output.push(action.JUMPING);
+		listOfGestures += "<li>Jumping</li>";
 	}
 	else
 	{
-		//listOfGestures += "<li> - </li>";	
+		listOfGestures += "<li> - </li>";	
+	}
+
+	if (IsStatuePose1(jointMeshes, floorHeight))
+	{
+		output.push(action.STATUE1);
+		listOfGestures += "<li>Statue 1</li>";
+	}
+	else
+	{
+		listOfGestures += "<li> - </li>";	
+	}
+
+	if (IsStatuePose2(jointMeshes, floorHeight))
+	{
+		output.push(action.STATUE2);
+		listOfGestures += "<li>Statue 2</li>";
+	}
+	else
+	{
+		listOfGestures += "<li> - </li>";	
 	}
 
 
@@ -88,6 +108,13 @@ function GetActions(jointMeshes, floorHeight = 0, testPage = false)
 	}
 
 	return output;
+}
+
+function IsStatuePose2(jointMeshes, floorHeight = 0)
+{
+	
+
+	return true;
 }
 
 function IsStatuePose1(jointMeshes, floorHeight = 0)
@@ -110,6 +137,13 @@ function IsStatuePose1(jointMeshes, floorHeight = 0)
 	var isRightFootDown = Math.abs(rightFootToRightKneeForwardDot) < 0.1 && Math.abs(rightFootToRightKneeRightDot) < 0.2;
 
 	return isHandsOnHead && isElbowsOutwards && isLeftFootOnFloor && isRightKneeForwards && isRightFootDown;
+}
+
+function IsJumping(jointMeshes, floorHeight = 0)
+{
+	var isLeftFootOnFloor = Math.abs(jointMeshes[kinectron.FOOTLEFT].position.y - floorHeight);
+	var isRightFootOnFloor = Math.abs(jointMeshes[kinectron.FOOTRIGHT].position.y - floorHeight);
+	return isLeftFootOnFloor > 0.1 && isRightFootOnFloor > 0.1;
 }
 
 function IsStanding(jointMeshes, floorHeight = 0)
@@ -136,7 +170,6 @@ function IsCrouching(jointMeshes, floorHeight = 0)
 	leftKneeToAnkleV.z = jointMeshes[kinectron.ANKLELEFT].position.z - jointMeshes[kinectron.KNEELEFT].position.z;
 
 	var leftKneeAngle = AngleBetweenVectors(leftKneeToHipV, leftKneeToAnkleV);
-
 	
 	var rightKneeToHipV = new THREE.Vector3(0,0,0);
 	rightKneeToHipV.x = jointMeshes[kinectron.HIPRIGHT].position.x - jointMeshes[kinectron.KNEERIGHT].position.x;
@@ -150,7 +183,10 @@ function IsCrouching(jointMeshes, floorHeight = 0)
 
 	var rightKneeAngle = AngleBetweenVectors(rightKneeToHipV, rightKneeToAnkleV);
 
-	return leftKneeAngle < 1.5 && rightKneeAngle < 1.5;
+	var isLeftFootOnFloor = Math.abs(jointMeshes[kinectron.FOOTLEFT].position.y - floorHeight);
+	var isRightFootOnFloor = Math.abs(jointMeshes[kinectron.FOOTRIGHT].position.y - floorHeight);
+
+	return leftKneeAngle < 1.5 && rightKneeAngle < 1.5 && isLeftFootOnFloor < 0.1 && isRightFootOnFloor < 0.1;
 }
 
 var rightHandPosLastFrame = new THREE.Vector3(0,0,0);
