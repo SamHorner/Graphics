@@ -112,9 +112,32 @@ function GetActions(jointMeshes, floorHeight = 0, testPage = false)
 
 function IsStatuePose2(jointMeshes, floorHeight = 0)
 {
-	
+	var distanceBetweenFeet = VectorDistance(jointMeshes[kinectron.FOOTRIGHT].position, jointMeshes[kinectron.FOOTLEFT].position);
+	var leftFootToFloor = Math.abs(jointMeshes[kinectron.FOOTLEFT].position.y - floorHeight);
+	var rightFootToFloor = Math.abs(jointMeshes[kinectron.FOOTRIGHT].position.y - floorHeight);
 
-	return true;
+	var rightShoulderToElbowForwardDot = DotProductWithForwardVector(MinusVector(jointMeshes[kinectron.SHOULDERRIGHT].position, jointMeshes[kinectron.ELBOWRIGHT].position));
+	var rightShoulderToElbowUpDot = DotProductWithUpVector(MinusVector(jointMeshes[kinectron.SHOULDERRIGHT].position, jointMeshes[kinectron.ELBOWRIGHT].position));
+	var leftShoulderToElbowForwardDot = DotProductWithForwardVector(MinusVector(jointMeshes[kinectron.SHOULDERLEFT].position, jointMeshes[kinectron.ELBOWLEFT].position));
+	var leftShoulderToElbowUpDot = DotProductWithUpVector(MinusVector(jointMeshes[kinectron.SHOULDERLEFT].position, jointMeshes[kinectron.ELBOWLEFT].position));
+
+	var rightElbowToHandForwardDot = DotProductWithForwardVector(MinusVector(jointMeshes[kinectron.ELBOWRIGHT].position, jointMeshes[kinectron.HANDRIGHT].position));
+	var rightElbowToHandRightDot = DotProductWithRightVector(MinusVector(jointMeshes[kinectron.ELBOWRIGHT].position, jointMeshes[kinectron.HANDRIGHT].position));
+	var rightElbowToHandUpDot = DotProductWithUpVector(MinusVector(jointMeshes[kinectron.ELBOWRIGHT].position, jointMeshes[kinectron.HANDRIGHT].position));
+	var leftElbowToHandForwardDot = DotProductWithForwardVector(MinusVector(jointMeshes[kinectron.ELBOWLEFT].position, jointMeshes[kinectron.HANDLEFT].position));
+	var leftElbowToHandRightDot = DotProductWithRightVector(MinusVector(jointMeshes[kinectron.ELBOWLEFT].position, jointMeshes[kinectron.HANDLEFT].position));
+	var leftElbowToHandUpDot = DotProductWithUpVector(MinusVector(jointMeshes[kinectron.ELBOWLEFT].position, jointMeshes[kinectron.HANDLEFT].position));
+
+	var angleRightKnee = AngleBetweenVectors(MinusVector(jointMeshes[kinectron.HIPRIGHT].position, jointMeshes[kinectron.KNEERIGHT].position),MinusVector(jointMeshes[kinectron.ANKLERIGHT].position, jointMeshes[kinectron.KNEERIGHT].position));
+	var angleRightKnee = AngleBetweenVectors(MinusVector(jointMeshes[kinectron.HIPLEFT].position, jointMeshes[kinectron.KNEELEFT].position),MinusVector(jointMeshes[kinectron.ANKLELEFT].position, jointMeshes[kinectron.KNEELEFT].position));
+
+	var isStandingCorrect = distanceBetweenFeet < 0.3 && leftFootToFloor < 0.2 && rightFootToFloor < 0.2 && Math.abs(angleRightKnee) - 1.57 < 0.3 && Math.abs(angleLeftKnee) - 1.57 < 0.3;
+	var isRightArmInPosition = Math.abs(rightShoulderToElbowForwardDot) < 0.1 && Math.abs(rightShoulderToElbowUpDot) < 0.1;
+	var isRightHandInPosition = Math.abs(rightElbowToHandForwardDot) < 0.1 && Math.abs(rightElbowToHandRightDot) < 0.1 && rightElbowToHandUpDot > 0.5;
+	var isLeftArmInPosition = Math.abs(leftShoulderToElbowForwardDot) < 0.1 && Math.abs(leftShoulderToElbowUpDot) < 0.1;
+	var isLeftHandInPosition = Math.abs(leftElbowToHandForwardDot) < 0.1 && Math.abs(leftElbowToHandRightDot) < 0.1 && leftElbowToHandUpDot > 0.5; 
+
+	return isStandingCorrect && isRightArmInPosition && isRightHandInPosition && isLeftArmInPosition && isLeftHandInPosition;
 }
 
 function IsStatuePose1(jointMeshes, floorHeight = 0)
