@@ -133,7 +133,7 @@ function IsStatuePose2(jointMeshes, floorHeight = 0)
 
 	var isStandingCorrect = distanceBetweenFeet < 0.3 && leftFootToFloor < 0.2 && rightFootToFloor < 0.2 && Math.abs(angleRightKnee) - 1.57 < 0.3 && Math.abs(angleLeftKnee) - 1.57 < 0.3;
 	var isRightArmInPosition = Math.abs(rightShoulderToElbowForwardDot) < 0.1 && Math.abs(rightShoulderToElbowUpDot) < 0.1;
-	var isRightHandInPosition = Math.abs(rightElbowToHandForwardDot) < 0.1 && Math.abs(rightElbowToHandRightDot) < 0.1 && rightElbowToHandUpDot > 0.5;
+	var isRightHandInPosition = Math.abs(rightElbowToHandForwardDot) < 0.1 && Math.abs(rightElbowToHandRightDot) < 0.1 && rightElbowToHandUpDot < 0.5;
 	var isLeftArmInPosition = Math.abs(leftShoulderToElbowForwardDot) < 0.1 && Math.abs(leftShoulderToElbowUpDot) < 0.1;
 	var isLeftHandInPosition = Math.abs(leftElbowToHandForwardDot) < 0.1 && Math.abs(leftElbowToHandRightDot) < 0.1 && leftElbowToHandUpDot > 0.5; 
 
