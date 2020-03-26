@@ -123,19 +123,19 @@ function IsStatuePose2(jointMeshes, floorHeight = 0)
 
 	var rightElbowToHandForwardDot = DotProductWithForwardVector(MinusVector(jointMeshes[kinectron.ELBOWRIGHT].position, jointMeshes[kinectron.HANDRIGHT].position));
 	var rightElbowToHandRightDot = DotProductWithRightVector(MinusVector(jointMeshes[kinectron.ELBOWRIGHT].position, jointMeshes[kinectron.HANDRIGHT].position));
-	var rightElbowToHandUpDot = DotProductWithUpVector(MinusVector(jointMeshes[kinectron.ELBOWRIGHT].position, jointMeshes[kinectron.HANDRIGHT].position));
+	var rightElbowToHandHeight = jointMeshes[kinectron.HANDRIGHT].position.y - jointMeshes[kinectron.ELBOWRIGHT].position.y;
 	var leftElbowToHandForwardDot = DotProductWithForwardVector(MinusVector(jointMeshes[kinectron.ELBOWLEFT].position, jointMeshes[kinectron.HANDLEFT].position));
 	var leftElbowToHandRightDot = DotProductWithRightVector(MinusVector(jointMeshes[kinectron.ELBOWLEFT].position, jointMeshes[kinectron.HANDLEFT].position));
-	var leftElbowToHandUpDot = DotProductWithUpVector(MinusVector(jointMeshes[kinectron.ELBOWLEFT].position, jointMeshes[kinectron.HANDLEFT].position));
+	var leftElbowToHandUpDot = jointMeshes[kinectron.HANDLEFT].position.y - jointMeshes[kinectron.ELBOWLEFT].position.y;
 
 	var angleRightKnee = AngleBetweenVectors(MinusVector(jointMeshes[kinectron.HIPRIGHT].position, jointMeshes[kinectron.KNEERIGHT].position),MinusVector(jointMeshes[kinectron.ANKLERIGHT].position, jointMeshes[kinectron.KNEERIGHT].position));
-	var angleRightKnee = AngleBetweenVectors(MinusVector(jointMeshes[kinectron.HIPLEFT].position, jointMeshes[kinectron.KNEELEFT].position),MinusVector(jointMeshes[kinectron.ANKLELEFT].position, jointMeshes[kinectron.KNEELEFT].position));
+	var angleLeftKnee = AngleBetweenVectors(MinusVector(jointMeshes[kinectron.HIPLEFT].position, jointMeshes[kinectron.KNEELEFT].position),MinusVector(jointMeshes[kinectron.ANKLELEFT].position, jointMeshes[kinectron.KNEELEFT].position));
 
-	var isStandingCorrect = distanceBetweenFeet < 0.3 && leftFootToFloor < 0.2 && rightFootToFloor < 0.2 && Math.abs(angleRightKnee) - 1.57 < 0.3 && Math.abs(angleLeftKnee) - 1.57 < 0.3;
-	var isRightArmInPosition = Math.abs(rightShoulderToElbowForwardDot) < 0.1 && Math.abs(rightShoulderToElbowUpDot) < 0.1;
-	var isRightHandInPosition = Math.abs(rightElbowToHandForwardDot) < 0.1 && Math.abs(rightElbowToHandRightDot) < 0.1 && rightElbowToHandUpDot < 0.5;
-	var isLeftArmInPosition = Math.abs(leftShoulderToElbowForwardDot) < 0.1 && Math.abs(leftShoulderToElbowUpDot) < 0.1;
-	var isLeftHandInPosition = Math.abs(leftElbowToHandForwardDot) < 0.1 && Math.abs(leftElbowToHandRightDot) < 0.1 && leftElbowToHandUpDot > 0.5; 
+	var isStandingCorrect = distanceBetweenFeet < 0.5 && leftFootToFloor < 0.2 && rightFootToFloor < 0.2 && Math.abs(angleRightKnee) - 3.14 < 0.3 && Math.abs(angleLeftKnee) - 3.14 < 0.3;
+	var isRightArmInPosition = /*Math.abs(rightShoulderToElbowForwardDot) < 0.8 &&*/ Math.abs(rightShoulderToElbowUpDot) < 0.5;
+	var isRightHandInPosition = Math.abs(rightElbowToHandForwardDot) < 0.4 && Math.abs(rightElbowToHandRightDot) < 0.4 && rightElbowToHandHeight < 0.0;
+	var isLeftArmInPosition = /*Math.abs(leftShoulderToElbowForwardDot) < 0.8 &&*/ Math.abs(leftShoulderToElbowUpDot) < 0.4;
+	var isLeftHandInPosition = Math.abs(leftElbowToHandForwardDot) < 0.4 && Math.abs(leftElbowToHandRightDot) < 0.4 && leftElbowToHandUpDot > 0.0; 
 
 	return isStandingCorrect && isRightArmInPosition && isRightHandInPosition && isLeftArmInPosition && isLeftHandInPosition;
 }
@@ -385,14 +385,7 @@ function DotProductWithUpVector(vec)
 	vec.y /= VectorMagnitude(vec);
 	vec.z /= VectorMagnitude(vec);
 
-	var upVector = new THREE.Vector3(0,0,0);
-	upVector.x = jointMeshes[kinectron.SPINESHOULDER].position.x - jointMeshes[kinectron.SPINEMID].position.x;
-	upVector.y = jointMeshes[kinectron.SPINESHOULDER].position.y - jointMeshes[kinectron.SPINEMID].position.y;
-	upVector.z = jointMeshes[kinectron.SPINESHOULDER].position.z - jointMeshes[kinectron.SPINEMID].position.z;
-
-	upVector.x /= VectorMagnitude(upVector);
-	upVector.y /= VectorMagnitude(upVector);
-	upVector.z /= VectorMagnitude(upVector);
+	var upVector = new THREE.Vector3(0,1,0);
 
 	return DotProduct(vec, upVector);
 }
@@ -405,7 +398,7 @@ function DotProductWithRightVector(vec)
 
 	var upVector = new THREE.Vector3(0,0,0);
 	upVector.x = jointMeshes[kinectron.SPINESHOULDER].position.x - jointMeshes[kinectron.SPINEMID].position.x;
-	upVector.y = jointMeshes[kinectron.SPINESHOULDER].position.y - jointMeshes[kinectron.SPINEMID].position.y;
+	upVector.y = 0;
 	upVector.z = jointMeshes[kinectron.SPINESHOULDER].position.z - jointMeshes[kinectron.SPINEMID].position.z;
 
 	upVector.x /= VectorMagnitude(upVector);
@@ -423,7 +416,7 @@ function DotProductWithForwardVector(vec)
 
 	var rightVector = new THREE.Vector3(0,0,0);
 	rightVector.x = jointMeshes[kinectron.SHOULDERRIGHT].position.x - jointMeshes[kinectron.SHOULDERLEFT].position.x;
-	rightVector.y = jointMeshes[kinectron.SHOULDERRIGHT].position.y - jointMeshes[kinectron.SHOULDERLEFT].position.y;
+	rightVector.y = 0;
 	rightVector.z = jointMeshes[kinectron.SHOULDERRIGHT].position.z - jointMeshes[kinectron.SHOULDERLEFT].position.z;
 
 	rightVector.x /= VectorMagnitude(rightVector);

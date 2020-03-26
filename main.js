@@ -27,7 +27,7 @@ var iJsonFrame = 0;
 var jsonMotion = null;
 
 // Read the JSON file motion.json
-readTextFile("Motions/armLeftTol.json", function(text)
+readTextFile("Motions/Static Raising Left Hand Lowering Right Hand 01.json", function(text)
 {
     jsonMotion = JSON.parse(text);
     iJsonFrame = Object.keys(jsonMotion).length;
@@ -48,7 +48,7 @@ kinectron.startTrackedBodies(getBodies); // Start tracked bodies and set callbac
 
 
 var currentActions = []
-var floor = -1;
+var floor = -0.75;
 
 
 // Scene
