@@ -25,7 +25,7 @@ function GetActions(jointMeshes, floorHeight = 0, testPage = false)
 
 	if (IsCrouching(jointMeshes, floorHeight))
 	{
-		output.push(action.Crouching);
+		output.push(action.CROUCHING);
 		listOfGestures += "<li>Crouching</li>";
 	}
 	else

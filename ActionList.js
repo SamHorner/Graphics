@@ -8,5 +8,7 @@ const action = {
     PUNCHINGLEFT: 5, // Student 3
     PUNCHINGRIGHT: 6, // Student 3
     CROUCHING: 7, // Student 3
-    STATUE1: 8 // Student 3
+    STATUE1: 8, // Student 3
+    STATUE2: 9, // Student 3
+    JUMPING: 10 // Student 3
 };
